@@ -14,10 +14,28 @@ app.get('/', async (req, res) => {
     res.render('index', {shortUrls: shortUrls})
 })
 
+app.post('/shortUrls', async (req, res) => {
+    await ShortUrl.create({
+        full: req.body.fullURL
+    })
+    res.redirect('/');
+})
+
+
+app.get('/:shortUrl', async (req, res) => {
+    const shortUrl = await ShortUrl.findOne({ short: req.params.shortUrl})
+    if(shortUrl == null)
+    {
+        res.render('notfound')
+    }
+    shortUrl.clicks++;
+    shortUrl.save();
+    res.redirect(shortUrl.full)
+})
+
 app.listen(port, function(err){
     if(err){
-        console.log(`Error in running server: ${err}`);
-        return;
+        console.log(`Error in running ther server: ${err}`)
     }
-    console.log(`Server is up and running on port : ${port}`)
+    console.log(`Server is up and running on port: ${port}`)
 })
